@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "335343074663",
+    "project_id": "soil-check",
+    "storage_bucket": "soil-check.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:335343074663:android:9132f74496f628e2d703c2",
+        "android_client_info": {
+          "package_name": "com.gidyon.soilcheck"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "335343074663-e16jgviridvj3v0nl1emg0ct3ihdtkjr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gidyon.soilcheck",
+            "certificate_hash": "d1dcee15ccc22a3774fddebbb551d5efa123858b"
+          }
+        },
+        {
+          "client_id": "335343074663-olb48h4hgfhtq8arc746hm4f1mpu8phh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAd-31qdqPp2KZ1yAHHzhMZU1HEBg6CubY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "335343074663-olb48h4hgfhtq8arc746hm4f1mpu8phh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
