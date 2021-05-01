@@ -1,0 +1,44 @@
+[
+    {
+        "label": "0 black",
+        "description": "Detect black color on the image",
+        "recommendations": {
+            "sw": [
+                "(Black) Fanya x",
+                "(Black) Fanya Y"
+            ],
+            "en": [
+                "(Black) Do x",
+                "(Black) Do y"
+            ]
+        }
+    },
+    {
+        "label": "1 white",
+        "description": "Detected significant white color on image",
+        "recommendations": {
+            "sw": [
+                "(White) Fanya x",
+                "(White) Fanya Y"
+            ],
+            "en": [
+                "(White) Do x",
+                "(White) Do y"
+            ]
+        }
+    },
+    {
+        "label": "2 blue",
+        "description": "Detected significant blue color on image",
+        "recommendations": {
+            "sw": [
+                "(Blue) Fanya x",
+                "(Blue) Fanya Y"
+            ],
+            "en": [
+                "(Blue) Do x",
+                "(Blue) Do y"
+            ]
+        }
+    }
+]

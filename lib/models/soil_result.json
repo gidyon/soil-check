@@ -1,0 +1,29 @@
+{
+    "resultId": "",
+    "ownerPhone": "",
+    "timestamp": 123,
+    "label": "ACIDIC",
+    "confidence": 0.88,
+    "resultsReady": true,
+    "resultSynced": false,
+    "resultDescription": "The soil has higher pH",
+    "resultStatus": "",
+    "imageBase64": "",
+    "imageUrl": "",
+    "modelResults": [
+        {
+            "label": "ACIDIC",
+            "confidence": 0.99
+        }
+    ],
+    "recommendations": {
+        "sw": [
+            "Nunua xyz fertiizer",
+            "Panda xyz"
+        ],
+        "en": [
+            "Buy xyz fertiizer",
+            "Plant xyz crop"
+        ]
+    }
+}

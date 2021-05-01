@@ -22,7 +22,6 @@ class Utils {
     return phone;
   }
 
-
   static String validateEmail(String value) {
     String pattern =
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
@@ -50,5 +49,7 @@ class Utils {
 
   static String capitalize(String s) => (s != null && s.length > 1)
       ? s[0].toUpperCase() + s.substring(1)
-      : s != null ? s.toUpperCase() : null;
+      : s != null
+          ? s.toUpperCase()
+          : null;
 }
