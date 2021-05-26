@@ -1,8 +1,8 @@
 import 'dart:convert';
+import 'package:flutter_app/home.dart';
 import 'package:flutter_app/services/soil_result_sqlite.dart';
 import 'package:flutter_app/utils/colors.dart';
 import 'package:flutter_app/views/result/result.dart';
-import 'package:flutter_app/views/newtest/test.dart';
 import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
@@ -14,8 +14,15 @@ class ResultsScreen extends StatefulWidget {
 }
 
 class _ResultsScreenState extends State<ResultsScreen> {
-  final Future<List<SoilCheckResult>> _soilResults =
+  Future<List<SoilCheckResult>> _soilResults =
       SoilResultSQLite.getSoilTestResults();
+
+  @override
+  void initState() {
+    super.initState();
+    // TODO: implement initState
+    // SoilResultSQLite.clearSoilResults();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +44,11 @@ class _ResultsScreenState extends State<ResultsScreen> {
                             SoilCheckResult soilResult = soilResults[index];
                             return SoilTestPageTile(
                               soilResult: soilResult,
+                              updateFn: () {
+                                _soilResults =
+                                    SoilResultSQLite.getSoilTestResults();
+                                setState(() {});
+                              },
                             );
                           },
                         )
@@ -65,13 +77,16 @@ class _ResultsScreenState extends State<ResultsScreen> {
                             Container(
                               child: FloatingActionButton.extended(
                                 label: Text('Get Started'),
-                                heroTag: UniqueKey(),
                                 onPressed: () async {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              SoilTestPage()));
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) => Home(
+                                        initialPage: 1,
+                                      ),
+                                    ),
+                                  );
+                                  ;
                                 },
                                 icon: Icon(Icons.camera),
                               ),
@@ -124,8 +139,10 @@ String wrapExtraText(String text, count) {
 
 class SoilTestPageTile extends StatelessWidget {
   final SoilCheckResult soilResult;
+  final Function() updateFn;
 
-  const SoilTestPageTile({Key key, this.soilResult}) : super(key: key);
+  const SoilTestPageTile({Key key, this.soilResult, this.updateFn})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -190,7 +207,7 @@ class SoilTestPageTile extends StatelessWidget {
                       label: Text(
                         'View Results',
                         style: TextStyle(
-                          color: soilResult.resultsReady
+                          color: soilResult.resultsReady == 1
                               ? AppColors.shadeGreen
                               : AppColors.primaryColor,
                         ),
@@ -199,7 +216,7 @@ class SoilTestPageTile extends StatelessWidget {
                         var decodedImage = await decodeImageFromList(
                           base64.decode(soilResult.imageBase64),
                         );
-                        Navigator.push(
+                        await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (BuildContext context) =>
@@ -210,20 +227,23 @@ class SoilTestPageTile extends StatelessWidget {
                             ),
                           ),
                         );
+                        if (updateFn != null) {
+                          updateFn();
+                        }
                       },
                       icon: Icon(
                         Icons.east,
-                        color: soilResult.resultsReady
+                        color: soilResult.resultsReady == 1
                             ? AppColors.shadeGreen
                             : AppColors.primaryColor,
                       ),
                     ),
                     Icon(
-                      soilResult.resultsReady ?? false
+                      soilResult.resultsReady == 1 ?? false
                           ? Icons.check_circle
                           : Icons.report,
                       size: 24,
-                      color: soilResult.resultsReady
+                      color: soilResult.resultsReady == 1
                           ? AppColors.shadeGreen
                           : AppColors.primaryColor,
                     ),

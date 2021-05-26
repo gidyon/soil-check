@@ -21,11 +21,28 @@ class DBProvider {
   initDB() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, "store.db");
-    return await openDatabase(path, version: 3, onOpen: (db) {},
+    return await openDatabase(path, version: 15, onOpen: (db) {},
         onCreate: (Database db, int version) async {
       await db.execute("CREATE TABLE SoilCheckResults ("
           "id INTEGER PRIMARY KEY,"
-          "resultsJson TEXT not null"
+          "timestamp INTEGER not null,"
+          "ownerPhone TEXT not null,"
+          "homeStead TEXT not null,"
+          "zone TEXT not null,"
+          "notes TEXT,"
+          "longitude REAL not null,"
+          "latitude REAL not null,"
+          "testType TEXT not null,"
+          "label TEXT not null,"
+          "confidence REAL not null,"
+          "resultsReady INTEGER not null,"
+          "resultSynced INTEGER not null,"
+          "resultDescription TEXT not null,"
+          "resultStatus TEXT not null,"
+          "imageBase64 TEXT not null,"
+          "imageUrl TEXT,"
+          "modelResults TEXT not null,"
+          "recommendations TEXT"
           ")");
       await db.execute("CREATE TABLE Account ("
           "id INTEGER PRIMARY KEY,"

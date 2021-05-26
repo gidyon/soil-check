@@ -11,16 +11,74 @@ class _GuidePageState extends State<GuidePage> {
   List<Map> _steps = [
     {
       "isFirst": true,
-      "en": 'Take photo or upload image of cafeteire paper',
-      "title": "Take/Upload Photo",
-      "imageUrl": "assets/images/take-photo.jpg"
+      "title": "Select Test Type",
+      "imageUrl": "assets/images/take-photo.jpg",
+      "steps": {
+        "en": [
+          {
+            "text": "Either pH / phosphate / nitratee",
+          },
+          {
+            "text": "Each option then triggers a different set of instructions",
+          }
+        ]
+      },
     },
     {
-      "en": 'Crop the image to capture the desired area',
-      "title": "Crop Photo",
-      "imageUrl": "assets/images/cropping.jpg"
+      "isFirst": true,
+      "title": "Cafetiere step",
+      "imageUrl": "assets/images/take-photo.jpg",
+      "steps": {
+        "en": [
+          {
+            "text": "Add soil, then add water and mix within the cafetiere",
+            "image": "assets/images/take-photo.jpg",
+          },
+          {
+            "text":
+                "Trap the soil below the filter mesh and poor a small amount of the water into a separate container",
+            "image": "assets/images/take-photo.jpg",
+          }
+        ]
+      },
     },
-    {"en": 'Get results and useful recommdendations', "title": "Get Results"},
+    {
+      "isFirst": true,
+      "title": "Test PAD",
+      "imageUrl": "assets/images/take-photo.jpg",
+      "steps": {
+        "en": [
+          {
+            "text":
+                "Select ‘start the test’ (this will start a timer) and immediately place the PAD onto the decanted water sample.",
+            "image": "assets/images/take-photo.jpg",
+          },
+          {
+            "text":
+                "Once timer ends an instruction to prompt the user to now take the photograph Upload image prompt (reminder to submit later if needed)",
+            "image": "assets/images/take-photo.jpg",
+          }
+        ]
+      },
+    },
+    {
+      "isFirst": true,
+      "title": "PAD (water sample)",
+      "imageUrl": "assets/images/take-photo.jpg",
+      "steps": {
+        "en": [
+          {
+            "text":
+                "Repeat the PAD test using some water that has not been mixed with soil.",
+            "image": "assets/images/take-photo.jpg",
+          },
+          {
+            "text": "Upload image prompt (reminder to submit later if needed)",
+            "image": "assets/images/take-photo.jpg",
+          }
+        ]
+      },
+    },
   ];
 
   @override
@@ -29,23 +87,17 @@ class _GuidePageState extends State<GuidePage> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: AppColors.primaryColor,
-        title: Text('Guide To Using Soil Check'),
+        title: Text('Guide To Soil Check'),
       ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
           width: MediaQuery.of(context).size.width,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Center(
-                child: Text(
-                  "This guide is subject to changes",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
               Container(
                 child: ListView.builder(
                   shrinkWrap: true,
@@ -64,7 +116,7 @@ class _GuidePageState extends State<GuidePage> {
                       endChild: _RightChild(
                         asset: _steps[index]["imageUrl"],
                         title: '${index + 1}. ${_steps[index]["title"]}',
-                        message: '${_steps[index]["en"]}',
+                        steps: _steps[index]["steps"]["en"],
                       ),
                       beforeLineStyle: LineStyle(
                         color: AppColors.primaryColor.withAlpha(50),
@@ -86,13 +138,13 @@ class _RightChild extends StatelessWidget {
     Key key,
     this.asset,
     this.title,
-    this.message,
+    this.steps,
     this.disabled = false,
   }) : super(key: key);
 
   final String asset;
   final String title;
-  final String message;
+  final List<Map<String, String>> steps;
   final bool disabled;
 
   @override
@@ -114,9 +166,7 @@ class _RightChild extends StatelessWidget {
               Text(
                 title,
                 style: TextStyle(
-                  color: disabled
-                      ? const Color(0xFFBABABA)
-                      : const Color(0xFF636564),
+                  color: const Color(0xFF636564),
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                 ),
@@ -124,23 +174,54 @@ class _RightChild extends StatelessWidget {
               const SizedBox(height: 6),
               Container(
                 constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.6),
-                child: Text(
-                  message,
-                  style: TextStyle(
-                    color: disabled
-                        ? const Color(0xFFD5D5D5)
-                        : const Color(0xFF636564),
-                    fontSize: 16,
-                  ),
+                  maxWidth: MediaQuery.of(context).size.width * 0.75,
+                ),
+                child: Column(
+                  children: steps
+                      .map((step) => Container(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(String.fromCharCode(0x2022)),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Flexible(
+                                      child: Text(
+                                        step["text"],
+                                        style: TextStyle(
+                                          color: disabled
+                                              ? const Color(0xFFD5D5D5)
+                                              : const Color(0xFF636564),
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 5),
+                                step["image"] != null
+                                    ? Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 12),
+                                        child: Image.asset(
+                                          step["image"],
+                                          height: 100,
+                                        ),
+                                      )
+                                    : SizedBox(),
+                                const SizedBox(height: 20),
+                              ],
+                            ),
+                          ))
+                      .toList(),
                 ),
               ),
-              asset != null
-                  ? Image.asset(
-                      asset,
-                      height: 100,
-                    )
-                  : SizedBox(),
             ],
           ),
         ],

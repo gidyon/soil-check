@@ -5,7 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_app/models/model_recomendations.dart';
 import 'package:flutter_app/models/soil_check_result.dart';
-import 'package:flutter_app/services/account_sqlite.dart';
+import 'package:flutter_app/services/account.dart';
 import 'package:flutter_app/services/soil_result_sqlite.dart';
 
 class SoilResultService {
@@ -27,7 +27,7 @@ class SoilResultService {
   }
 
   static Future<List<SoilCheckResult>> fetchResultsFirestore() async {
-    var account = await AccountServiceSQLite.getAccount();
+    var account = await AccountServiceV2.getAccount();
 
     List<SoilCheckResult> soilCheckResults;
 
@@ -77,7 +77,7 @@ class SoilResultService {
     var results = await SoilResultSQLite.getSoilTestResults();
     for (var i = 0; i < results.length; i++) {
       var result = results[1];
-      if (!result.resultSynced) {
+      if (result.resultSynced == 1) {
         await uploadSoilResult(result);
       }
     }

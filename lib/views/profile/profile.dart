@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/models/account.dart';
-import 'package:flutter_app/services/account_sqlite.dart';
+import 'package:flutter_app/services/account.dart';
 import 'package:flutter_app/utils/colors.dart';
 import 'package:flutter_app/views/signin/signup.dart';
 
@@ -11,7 +11,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final Future<Account> _account = AccountServiceSQLite.getAccount();
+  final Future<Account> _account = AccountServiceV2.getAccount();
   bool _loading = false;
 
   @override
@@ -98,11 +98,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (BuildContext context) =>
-                                        SignUpScreen(),
+                                        SignUpScreen(
+                                      phone: account.phone,
+                                      names: account.names,
+                                    ),
                                   ),
                                 );
                               },
-                              child: Text('Logout'),
+                              child: Text('Edit'),
                               style: OutlinedButton.styleFrom(),
                             ),
                           )

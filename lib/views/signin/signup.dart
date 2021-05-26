@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/home.dart';
+import 'package:flutter_app/models/account.dart';
+import 'package:flutter_app/services/account.dart';
 import 'package:flutter_app/utils/colors.dart';
 import 'package:flutter_app/utils/helpers.dart';
-import 'package:flutter_app/views/signin/otp.dart';
-import 'package:flutter_app/widgets/logo.dart';
 import 'package:flutter_app/widgets/powered_by.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
-import 'package:international_phone_input/international_phone_input.dart';
 import 'dart:async';
 
 class SignUpScreen extends StatefulWidget {
@@ -30,16 +30,36 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Future<void> _signIn() async {
     if (_signupFormKey.currentState.validate()) {
-      _signupFormKey.currentState.save();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (BuildContext context) => OtpScreen(
-            names: _fullNames,
-            phone: _phoneFormated,
+      try {
+        _signupFormKey.currentState.save();
+
+        await AccountServiceV2.setAccount(Account(
+          names: _fullNames,
+          phone: _phoneFormated,
+          language: 'ENGLISH',
+        ));
+
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (BuildContext context) => OtpScreen(
+        //       names: _fullNames,
+        //       phone: _phoneFormated,
+        //     ),
+        //   ),
+        // );
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) => Home(),
           ),
-        ),
-      );
+        );
+      } catch (e) {
+        setState(() {
+          _error = e.toString();
+        });
+      }
     } else {
       _signUpController.reset();
     }
@@ -83,7 +103,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              AppLogo(),
+              Container(
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  height: 100,
+                ),
+              ),
               SizedBox(
                 height: 40,
               ),
@@ -99,7 +124,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         child: Container(
                           padding: EdgeInsets.only(left: 20),
                           child: Text(
-                            'Fill in the fields to proceed',
+                            'Provide the following details',
                             style: TextStyle(
                               fontSize: 15,
                               color: Colors.black87,
@@ -150,16 +175,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       SizedBox(
                         height: 10,
                       ),
-                      InternationalPhoneInput(
-                        decoration: InputDecoration.collapsed(
-                            hintText: '(123) 123-1234'),
-                        onPhoneNumberChange: onPhoneNumberChange,
-                        initialPhoneNumber: phoneNumber,
-                        initialSelection: phoneIsoCode,
-                        enabledCountries: ['+233', '+1'],
-                        showCountryCodes: false,
-                        showCountryFlags: true,
-                      ),
                       Container(
                         child: TextFormField(
                           initialValue: _phone,
@@ -178,7 +193,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 TextStyle(color: Colors.black54, fontSize: 16),
                           ),
                           validator: (val) {
-                            return val.length < 10 || val.length > 13
+                            return val.length < 8 || val.length > 13
                                 ? 'Phone number entered invalid'
                                 : null;
                           },
@@ -196,7 +211,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       Container(
                         width: MediaQuery.of(context).size.width,
                         child: RoundedLoadingButton(
-                          child: Text('Continue',
+                          child: Text('Save Details',
                               style: TextStyle(color: Colors.white)),
                           controller: _signUpController,
                           width: MediaQuery.of(context).size.width,

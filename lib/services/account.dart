@@ -1,5 +1,6 @@
 import 'package:flutter_app/database.dart';
 import 'package:flutter_app/models/account.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const accountsTable = "Account";
 
@@ -29,5 +30,26 @@ class AccountServiceSQLite {
     await db.rawDelete("Delete from $accountsTable");
     // Add the user
     await db.insert(accountsTable, account.toJson());
+  }
+}
+
+class AccountServiceV2 {
+  static Future<Account> getAccount() async {
+    var sp = await SharedPreferences.getInstance();
+    var names = sp.getString("names");
+    var phone = sp.getString("phone");
+    var language = sp.getString("language");
+
+    var res = Account(
+        language: language ?? '', names: names ?? '', phone: phone ?? '');
+
+    return res;
+  }
+
+  static Future<void> setAccount(Account account) async {
+    var sp = await SharedPreferences.getInstance();
+    sp.setString("names", account.names);
+    sp.setString("phone", account.phone);
+    sp.setString("language", account.language);
   }
 }

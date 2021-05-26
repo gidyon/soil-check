@@ -1,9 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/home.dart';
 import 'package:flutter_app/utils/colors.dart';
-import 'package:flutter_app/views/signin/signup.dart';
+import 'package:flutter_app/views/init/page_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,6 +12,15 @@ void main() async {
 }
 
 class App extends StatelessWidget {
+  Future<bool> _agreedToPrivacy() async {
+    try {
+      var sp = await SharedPreferences.getInstance();
+      var b = sp.getBool('agreedToPrivacy');
+      return b == true;
+    } catch (e) {}
+    return false;
+  }
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -22,43 +31,26 @@ class App extends StatelessWidget {
         backgroundColor: AppColors.whiteColor,
         fontFamily: 'Nunito',
       ),
-      home: Landing(title: 'Flutter Demo Landing Page'),
-    );
-  }
-}
-
-class Landing extends StatefulWidget {
-  Landing({Key key, this.title}) : super(key: key);
-  final String title;
-
-  @override
-  _LandingState createState() => _LandingState();
-}
-
-class _LandingState extends State<Landing> {
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User>(
-      stream: FirebaseAuth.instance.userChanges(),
-      builder: (context, snapshot) {
-        print('user changes');
-        if (snapshot.connectionState == ConnectionState.active) {
-          User user = snapshot.data;
-          if (user == null) {
-            print('usrr null');
-            return SignUpScreen();
-          }
-          print('usrr nnot ull');
-
-          return Home();
-        } else {
-          return Scaffold(
-            body: Center(
+      home: FutureBuilder<bool>(
+        future: _agreedToPrivacy(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data) {
+              return Home();
+            } else {
+              return InitScreen();
+            }
+          } else if (snapshot.hasError) {
+            return InitScreen();
+          } else {
+            return SizedBox(
               child: CircularProgressIndicator(),
-            ),
-          );
-        }
-      },
+              width: 60,
+              height: 60,
+            );
+          }
+        },
+      ),
     );
   }
 }
