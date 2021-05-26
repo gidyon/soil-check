@@ -7,7 +7,6 @@ import 'package:flutter_app/services/location.dart';
 import 'package:flutter_app/utils/colors.dart';
 import 'package:flutter_app/views/newtest/takeshot.dart';
 import 'package:flutter_app/views/result/result_raw.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -20,7 +19,7 @@ class SoilTestPage extends StatefulWidget {
   _SoilTestPageState createState() => _SoilTestPageState();
 }
 
-const timeDuration = 10;
+const timeDuration = 5;
 
 class _SoilTestPageState extends State<SoilTestPage> {
   int counter = timeDuration;
@@ -255,7 +254,7 @@ class _SoilTestPageState extends State<SoilTestPage> {
                         children: [
                           Container(
                             child: Text(
-                              'Start timer and Dip the PAD into the the decanted water sample.',
+                              'Start the Timer and Dip the PAD into the the decanted water sample. Wait for 3 minutesx',
                               textAlign: TextAlign.center,
                               style: Theme.of(context)
                                   .textTheme

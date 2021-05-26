@@ -61,6 +61,11 @@ class _TakeShotState extends State<TakeShot> {
           title: 'Cropper',
         ));
 
+    if (croppedFile == null) {
+      _clearImage();
+      return;
+    }
+
     print('length of file after crop: ${croppedFile.lengthSync()}');
 
     Directory tempDir = await pPath.getTemporaryDirectory();
