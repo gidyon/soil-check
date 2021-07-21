@@ -20,6 +20,7 @@ class SoilCheckResult {
   double longitude;
   double latitude;
   String testType;
+  String tag;
   String label;
   double confidence;
   int resultsReady;
@@ -27,7 +28,9 @@ class SoilCheckResult {
   String resultDescription;
   String resultStatus;
   String imageBase64;
+  String imageRef;
   String imageUrl;
+  String firebaseId;
   ModelResults modelResults;
   Recommendations recommendations;
 
@@ -40,6 +43,7 @@ class SoilCheckResult {
       this.longitude,
       this.testType,
       this.timestamp,
+      this.tag,
       this.label,
       this.confidence,
       this.resultsReady,
@@ -47,7 +51,9 @@ class SoilCheckResult {
       this.resultDescription,
       this.resultStatus,
       this.imageBase64,
+      this.imageRef,
       this.imageUrl,
+      this.firebaseId,
       this.modelResults,
       this.recommendations});
 
@@ -70,6 +76,8 @@ class SoilCheckResult {
     timestamp = json['timestamp'];
     print('here 6');
     label = json['label'];
+    print('here 6');
+    tag = json['tag'];
     print('here 7');
     confidence = json['confidence'];
     print('here 8');
@@ -85,6 +93,9 @@ class SoilCheckResult {
     print('here 13');
     imageUrl = json['imageUrl'];
     print('here 14');
+    imageRef = json['imageRef'];
+    print('here 15');
+    firebaseId = json['firebaseId'];
     if (json['modelResults'] != null) {
       modelResults = json['modelResults'] != null
           ? ModelResults.fromJson(jsonDecode(json['modelResults']))
@@ -109,13 +120,16 @@ class SoilCheckResult {
     data['testType'] = this.testType;
     data['timestamp'] = this.timestamp;
     data['label'] = this.label;
+    data['tag'] = this.tag;
     data['confidence'] = this.confidence;
     data['resultsReady'] = this.resultsReady;
     data['resultSynced'] = this.resultSynced;
     data['resultDescription'] = this.resultDescription;
     data['resultStatus'] = this.resultStatus;
     data['imageBase64'] = this.imageBase64;
+    data['imageRef'] = this.imageRef;
     data['imageUrl'] = this.imageUrl;
+    data['firebaseId'] = this.firebaseId;
     if (this.modelResults != null) {
       data['modelResults'] = this.modelResults.toJson();
     }
