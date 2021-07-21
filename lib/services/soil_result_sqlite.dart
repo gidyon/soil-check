@@ -38,6 +38,7 @@ class SoilResultSQLite {
     // String resultStatus;
     // String imageBase64;
     // String imageUrl;
+    // String imageRef;
     // List<ModelResults> modelResults;
     // recommendations recommendations;
 
@@ -51,13 +52,16 @@ class SoilResultSQLite {
       "latitude": result.latitude,
       "testType": result.testType,
       "label": result.label,
+      "tag": result.tag,
       "confidence": result.confidence,
       "resultsReady": result.resultsReady,
       "resultSynced": result.resultSynced,
       "resultDescription": result.resultDescription,
       "resultStatus": result.resultStatus,
       "imageBase64": result.imageBase64,
+      "imageRef": result.imageRef,
       "imageUrl": result.imageUrl,
+      "firebaseId": result.firebaseId,
       "modelResults": modalResults,
       "recommendations": recommendations,
     });
