@@ -59,6 +59,9 @@ class SoilResultService {
     DocumentReference doc =
         FirebaseFirestore.instance.collection(soilResultsCollections).doc();
 
+    // Update id
+    soilCheckResult.firebaseId = doc.id;
+
     await doc.set(soilCheckResult.toJson());
   }
 
@@ -70,6 +73,7 @@ class SoilResultService {
     uploadTask = ref.putData(base64.decode(soilCheckResult.imageBase64));
     var taskSnapshot = await Future.value(uploadTask);
     var url = taskSnapshot.ref.getDownloadURL();
+    soilCheckResult.imageRef = taskSnapshot.metadata.fullPath;
     return url;
   }
 
