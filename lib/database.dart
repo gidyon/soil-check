@@ -20,8 +20,8 @@ class DBProvider {
 
   initDB() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, "store.db");
-    return await openDatabase(path, version: 15, onOpen: (db) {},
+    String path = join(documentsDirectory.path, "store5.db");
+    return await openDatabase(path, version: 19, onOpen: (db) {},
         onCreate: (Database db, int version) async {
       await db.execute("CREATE TABLE SoilCheckResults ("
           "id INTEGER PRIMARY KEY,"
@@ -33,15 +33,18 @@ class DBProvider {
           "longitude REAL not null,"
           "latitude REAL not null,"
           "testType TEXT not null,"
-          "label TEXT not null,"
-          "confidence REAL not null,"
-          "resultsReady INTEGER not null,"
-          "resultSynced INTEGER not null,"
-          "resultDescription TEXT not null,"
-          "resultStatus TEXT not null,"
+          "tag TEXT,"
+          "label TEXT,"
+          "confidence REAL ,"
+          "resultsReady INTEGER,"
+          "resultSynced INTEGER,"
+          "resultDescription TEXT,"
+          "resultStatus TEXT,"
           "imageBase64 TEXT not null,"
           "imageUrl TEXT,"
-          "modelResults TEXT not null,"
+          "imageRef TEXT,"
+          "firebaseId TEXT,"
+          "modelResults TEXT,"
           "recommendations TEXT"
           ")");
       await db.execute("CREATE TABLE Account ("
