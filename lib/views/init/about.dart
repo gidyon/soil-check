@@ -74,11 +74,11 @@ class _WelcomePageState extends State<WelcomePage> {
                 Navigator.push(
                     context,
                     PageRouteBuilder(
-                        transitionDuration: Duration(seconds: 1),
+                        transitionDuration: Duration(milliseconds: 300),
                         transitionsBuilder:
                             (context, animation, secondaryAnimation, child) {
                           animation = CurvedAnimation(
-                              parent: animation, curve: Curves.bounceOut);
+                              parent: animation, curve: Curves.easeIn);
                           return ScaleTransition(
                               scale: animation,
                               alignment: Alignment.center,
