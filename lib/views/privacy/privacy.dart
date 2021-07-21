@@ -107,11 +107,11 @@ class _PrivacyPageState extends State<PrivacyPage> {
                       Navigator.pushReplacement(
                         context,
                         PageRouteBuilder(
-                          transitionDuration: Duration(milliseconds: 1000),
+                          transitionDuration: Duration(milliseconds: 300),
                           transitionsBuilder:
                               (context, animation, secondaryAnimation, child) {
                             animation = CurvedAnimation(
-                                parent: animation, curve: Curves.bounceInOut);
+                                parent: animation, curve: Curves.easeIn);
                             return ScaleTransition(
                                 scale: animation,
                                 alignment: Alignment.center,
