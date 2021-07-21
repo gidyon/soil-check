@@ -19,7 +19,6 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart' as pPath;
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tflite/tflite.dart';
 
 class TakeShot extends StatefulWidget {
   final Function updateFn;
@@ -38,6 +37,11 @@ class _TakeShotState extends State<TakeShot> {
   bool _inProcess = false;
   String _error;
   SoilCheckResult _soilCheckResult;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   void _clearImage() {
     setState(() {
@@ -123,6 +127,7 @@ class _TakeShotState extends State<TakeShot> {
       await _cropImage(compressedFile.path);
     } catch (e) {
       print('Error happened while processing image: $e');
+      _showToastError('The image format is invalid');
     } finally {
       setState(() {
         _inProcess = false;
@@ -130,31 +135,17 @@ class _TakeShotState extends State<TakeShot> {
     }
   }
 
-  void _loadModel() async {
-    String res = await Tflite.loadModel(
-        model: "assets/model/model_unquant.tflite",
-        labels: "assets/model/labels.txt",
-        numThreads: 1, // defaults to 1
-        isAsset:
-            true, // defaults to true, set to false to load resources outside assets
-        useGpuDelegate:
-            false // defaults to false, set to true to use GPU delegate
-        );
-  }
-
-  Future<List<ModelResults>> _applyModel() async {
-    var recognitions = await Tflite.runModelOnImage(
-        path: _croppedFile.path, // required
-        imageMean: 0.0, // defaults to 117.0
-        imageStd: 1.0, // defaults to 1.0
-        numResults: 2, // defaults to 5
-        threshold: 0.2, // defaults to 0.1
-        asynch: true // defaults to true
-        );
-    return recognitions
-        .map(
-            (e) => ModelResults(label: e["label"], confidence: e["confidence"]))
-        .toList();
+  _showToastError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 2),
+        content: Text(
+          message,
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
   }
 
   Future<String> getHomeStead() async {
@@ -207,6 +198,16 @@ class _TakeShotState extends State<TakeShot> {
     }
   }
 
+  Future<String> getTag() async {
+    try {
+      var sp = await SharedPreferences.getInstance();
+      var lat = sp.getString("tag");
+      return lat;
+    } catch (e) {
+      return "";
+    }
+  }
+
   Future<String> getTestType() async {
     try {
       var sp = await SharedPreferences.getInstance();
@@ -230,14 +231,6 @@ class _TakeShotState extends State<TakeShot> {
     );
 
     try {
-      // Get model results
-      var modelResults = await _applyModel();
-
-      ModelResults firstResult;
-      if (modelResults.length > 0) {
-        firstResult = modelResults[0];
-      }
-
       // Image as bytes
       var imageBytes = base64.encode(_croppedFile.readAsBytesSync());
 
@@ -251,12 +244,11 @@ class _TakeShotState extends State<TakeShot> {
 
       print('preparing result json');
 
-      bool resultAboveConfidence = firstResult.confidence >= 0.8;
-
       var timestamp = DateTime.now().millisecondsSinceEpoch;
       var homeStead = await getHomeStead();
       var zone = await getZone();
       var notes = await getNotes();
+      var tag = await getTag();
       var long = await getLongitude();
       var lat = await getLatitude();
       var testType = await getTestType();
@@ -272,92 +264,51 @@ class _TakeShotState extends State<TakeShot> {
         "longitude": long,
         "latitude": lat,
         "testType": testType,
-        "label": firstResult.label,
-        "confidence": firstResult.confidence,
-        "resultsReady": resultAboveConfidence ? 1 : 0,
+        "tag": tag,
+        "label": "",
+        "confidence": 0.0,
+        "resultsReady": 0,
         "resultSynced": 0,
         "imageBase64": imageBytes,
         "resultStatus": "RESULTS_NOT_SENT",
       });
 
-      result.modelResults = firstResult;
+      var unableToSend = "Unable to send results to the server";
+      var awaitingReview =
+          "Results sent to the server. You'll be notified once its ready";
 
-      print('model confidence: ${firstResult.confidence}');
-
-      // Updates results offline
-      var updateResultOffline = () async {
-        print('preparing getting result offline');
-        var recomms = await SoilResultService.getLabelRecommendationsOffline(
-          context,
-          firstResult.label,
-        );
-        result.recommendations = recomms?.recommendations;
-        result.resultDescription = recomms?.description;
-
-        inspect(result);
-      };
-
-      // If confidence above 80% we good
-      if (resultAboveConfidence) {
-        // Get online recommdations
-        if (online) {
-          print('preparing getting result online');
-          var recomms = await SoilResultService.getLabelRecommendationsOnline(
-            firstResult.label,
-          );
-          if (recomms != null) {
-            result.recommendations = recomms.recommendations;
-            result.resultDescription = recomms.description;
-          } else {
-            print('no online results ooops');
-            await updateResultOffline();
-          }
-        } else {
-          print('preparing getting result offline');
-          await updateResultOffline();
-        }
-      } else {
-        result.resultDescription =
-            "Unable to infer correct result from image. Please send the results for further review";
-        result.resultsReady = 0;
-      }
+      result.resultDescription = unableToSend;
+      result.resultStatus = "RESULTS_NOT_SENT";
+      result.resultsReady = 0;
+      result.resultSynced = 0;
 
       // Save result to firestore if onlne
       try {
         if (online) {
           print('preparing to save to firebase online');
-          if (!resultAboveConfidence) {
-            result.resultStatus = "AWAITING_RESULTS";
-            result.resultDescription =
-                "Unable to infer correct result from image. We will notify you once we review the image";
-          } else {
-            result.resultStatus = "RESULTS_SENT";
-          }
+          result.resultStatus = "RESULTS_SENT";
+          result.resultDescription = awaitingReview;
           result.resultSynced = 1;
           await SoilResultService.uploadSoilResult(result);
         }
       } catch (e) {
-        result.resultSynced = 0;
         result.resultStatus = 'RESULTS_NOT_SENT';
-        print('failed to save results online: ${e.toString()}');
+        result.resultDescription = unableToSend;
+        result.resultsReady = 0;
+        result.resultSynced = 0;
+        print('failed to save results firebase online: ${e.toString()}');
       }
 
       // Update image since it was reset by the upload above
       result.imageBase64 = imageBytes;
 
-      inspect(result);
-
       // Update for test
-      if (result.resultStatus != 'RESULTS_NOT_SENT') {
+      if (result.resultStatus == 'RESULTS_SENT') {
         result.resultStatus = "AWAITING_RESULTS";
+        result.resultDescription = awaitingReview;
       }
-      result.resultDescription =
-          "Unable to infer correct result from image. We will notify you once we review the image";
-      result.resultsReady = 0;
 
       print('saving result locally');
-
-      inspect(result);
 
       // Save result locally
       result.resultId = await SoilResultSQLite.saveSoilTestResult(result);
@@ -407,12 +358,6 @@ class _TakeShotState extends State<TakeShot> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _loadModel();
-  }
-
   final RoundedLoadingButtonController _analyseController =
       new RoundedLoadingButtonController();
 
@@ -428,30 +373,6 @@ class _TakeShotState extends State<TakeShot> {
                     ? Container(
                         child: Column(
                           children: [
-                            // Container(
-                            //   color: Colors.green,
-                            //   padding: EdgeInsets.all(8),
-                            //   child: Row(
-                            //     children: [
-                            //       Icon(
-                            //         Icons.warning,
-                            //         color: AppColors.whiteColor,
-                            //       ),
-                            //       SizedBox(
-                            //         width: 10,
-                            //       ),
-                            //       Flexible(
-                            //         child: Text(
-                            //           'IMPORTANT',
-                            //           style: TextStyle(
-                            //             fontWeight: FontWeight.bold,
-                            //             color: AppColors.whiteColor,
-                            //           ),
-                            //         ),
-                            //       )
-                            //     ],
-                            //   ),
-                            // ),
                             Container(
                               padding: EdgeInsets.all(10),
                               child: Column(
@@ -501,6 +422,7 @@ class _TakeShotState extends State<TakeShot> {
                               children: [
                                 Container(
                                   child: FloatingActionButton.extended(
+                                    heroTag: 'camera',
                                     label: Text('TAKE CAMERA SHOT'),
                                     onPressed: () async {
                                       await _processImage(ImageSource.camera);
@@ -513,6 +435,7 @@ class _TakeShotState extends State<TakeShot> {
                                 ),
                                 Container(
                                   child: FloatingActionButton.extended(
+                                    heroTag: 'gallery',
                                     label: Text('UPLOAD FROM GALLERY'),
                                     onPressed: () async {
                                       await _processImage(ImageSource.gallery);
