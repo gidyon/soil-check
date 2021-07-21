@@ -43,10 +43,17 @@ class App extends StatelessWidget {
           } else if (snapshot.hasError) {
             return InitScreen();
           } else {
-            return SizedBox(
-              child: CircularProgressIndicator(),
-              width: 60,
-              height: 60,
+            return Scaffold(
+              backgroundColor: AppColors.primaryColor,
+              body: SafeArea(
+                child: Container(
+                  child: SizedBox(
+                    child: CircularProgressIndicator(),
+                    width: 60,
+                    height: 60,
+                  ),
+                ),
+              ),
             );
           }
         },
