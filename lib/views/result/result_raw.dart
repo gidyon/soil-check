@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/home.dart';
 import 'package:flutter_app/models/soil_check_result.dart';
 import 'package:flutter_app/services/save_result_cloud.dart';
 import 'package:flutter_app/services/soil_result_sqlite.dart';
@@ -36,8 +35,13 @@ class SoilResultWidget extends StatelessWidget {
       fontWeight: FontWeight.bold,
     );
 
+    var stylesDesc = TextStyle(
+        color: AppColors.primaryColor,
+        // fontWeight: FontWeight.bold,
+        fontStyle: FontStyle.italic);
+
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: EdgeInsets.symmetric(horizontal: 20),
       width: MediaQuery.of(context).size.width,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -116,6 +120,34 @@ class SoilResultWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
+                  ('Test Type'),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.shadeGreen,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(
+                  height: 5,
+                ),
+                Container(
+                  child: Text(
+                    '${soilResult.testType} Test',
+                    style: styles1,
+                  ),
+                )
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 15,
+          ),
+          Container(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
                   ('Saved Details'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -134,18 +166,21 @@ class SoilResultWidget extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              soilResult.homeStead.isNotEmpty
-                                  ? 'Homestead - ${soilResult.homeStead}'
-                                  : 'NA',
+                              '(Homestead) - ${soilResult.homeStead.isNotEmpty ? soilResult.homeStead : 'NA'}',
+                              style: styles1,
                             ),
                             Text(
-                              soilResult.zone.isNotEmpty
-                                  ? 'Zone - ${soilResult.homeStead}'
-                                  : 'NA',
+                              '(Zone) - ${soilResult.zone.isNotEmpty ? soilResult.zone : 'NA'}',
+                              style: styles1,
+                            ),
+                            Text(
+                              '(Test) - ${soilResult.testType.isNotEmpty ? soilResult.testType : 'NA'}',
+                              style: styles1,
                             ),
                             soilResult.notes.isNotEmpty
                                 ? Text(
                                     soilResult.notes,
+                                    style: stylesDesc,
                                   )
                                 : SizedBox()
                           ],
@@ -204,17 +239,6 @@ class SoilResultWidget extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    'Image and Test Data Submitted',
-                                    style: TextStyle(
-                                      color: AppColors.shadeGreen,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
                                   Container(
                                     padding: EdgeInsets.all(20),
                                     decoration: BoxDecoration(
@@ -234,10 +258,11 @@ class SoilResultWidget extends StatelessWidget {
                                         ),
                                         Flexible(
                                           child: Text(
-                                            ("We'll notify you when the results is ready"),
+                                            ("We'll notify you once the PAD results have been analysed")
+                                                .toUpperCase(),
                                             style: TextStyle(
                                               color: AppColors.whiteColor,
-                                              fontSize: 12,
+                                              fontSize: 13,
                                             ),
                                           ),
                                         ),
@@ -253,17 +278,6 @@ class SoilResultWidget extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  Text(
-                                    'Image and Test Data Not Submitted',
-                                    style: TextStyle(
-                                      color: AppColors.shadeGreen,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
                                   Container(
                                     padding: EdgeInsets.all(20),
                                     decoration: BoxDecoration(
@@ -283,14 +297,14 @@ class SoilResultWidget extends StatelessWidget {
                                         ),
                                         Flexible(
                                           child: Text(
-                                            ("Image and test data has not been sent to the server")
+                                            ("PAD Image and metadata has not been sent to the server")
                                                 .toUpperCase(),
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .bodyText1
                                                 .copyWith(
                                                   color: AppColors.whiteColor,
-                                                  fontSize: 12,
+                                                  fontSize: 13,
                                                 ),
                                           ),
                                         ),
